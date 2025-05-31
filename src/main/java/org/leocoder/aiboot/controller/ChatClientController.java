@@ -2,6 +2,7 @@ package org.leocoder.aiboot.controller;
 
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,11 +42,11 @@ public class ChatClientController {
      * @return  机器人回复的消息流
      */
     @GetMapping(value = "/generateStream", produces = "text/html;charset=utf-8")
-    public Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "你是谁？") String message) {
+    public Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "你是谁？") String message,
+                                       @RequestParam(value = "chatId") String chatId) {
         return chatClient.prompt()
                 // 提示词
-                .user(message)
-                // 流式输出
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
                 .stream()
                 .content();
 
